@@ -1,16 +1,11 @@
-#
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 #
 # (c) 2020 Yoichi Tanibayashi
 #
 import inkex
-import simplestyle
-# import simplepath
+from lxml import etree
 import math
-"""
-?? $ sudo apt install python-lxml
-"""
-inkex.localize()
+inkex.localization.localize
 
 
 class Point(object):
@@ -68,12 +63,12 @@ class SvgObj(object):
              stroke_width=DEF_STROKE_WIDTH,
              stroke_dasharray=DEF_STROKE_DASHARRAY):
 
-        self.attr['style'] = simplestyle.formatStyle({
+        self.attr['style'] = str(inkex.Style({
             'stroke': str(color),
             'stroke-width': str(stroke_width),
             'stroke-dasharray': str(stroke_dasharray),
-            'fill': 'none'})
-        return inkex.etree.SubElement(self.parent,
+            'fill': 'none'}))
+        return etree.SubElement(self.parent,
                                       inkex.addNS(self.type, 'svg'),
                                       self.attr)
 
@@ -228,7 +223,7 @@ class Part1(object):
 
         # グループ作成
         attr = {inkex.addNS('label', 'inkscape'): 'Part1'}
-        self.g = inkex.etree.SubElement(self.parent, 'g', attr)
+        self.g = etree.SubElement(self.parent, 'g', attr)
 
         # 図形作成
         self.points_outline = self.create_points_outline()
@@ -385,7 +380,7 @@ class Part2(object):
 
         # グループ作成
         attr = {inkex.addNS('label', 'inkscape'): 'Part2'}
-        self.g = inkex.etree.SubElement(self.parent, 'g', attr)
+        self.g = etree.SubElement(self.parent, 'g', attr)
 
         # 外枠
         #   ``Part1``の``points_outline``をミラーして、
@@ -436,47 +431,22 @@ class PliersCover(inkex.Effect):
 
     def __init__(self):
         inkex.Effect.__init__(self)
-        self.OptionParser.add_option("--tabs", action="store", type="string",
-                                     dest="tabs", help="")
-
-        self.OptionParser.add_option("--w1", action="store", type="float",
-                                     dest="w1", help="")
-        self.OptionParser.add_option("--w2", action="store", type="float",
-                                     dest="w2", help="")
-        self.OptionParser.add_option("--h1", action="store", type="float",
-                                     dest="h1", help="")
-        self.OptionParser.add_option("--h2", action="store", type="float",
-                                     dest="h2", help="")
-
-        self.OptionParser.add_option("--bw", action="store", type="float",
-                                     dest="bw", help="")
-        self.OptionParser.add_option("--bl", action="store", type="float",
-                                     dest="bl", help="")
-        self.OptionParser.add_option("--bf", action="store", type="float",
-                                     dest="bf", help="")
-
-        self.OptionParser.add_option("--dia1", action="store", type="float",
-                                     dest="dia1", help="")
-        self.OptionParser.add_option("--dia2", action="store", type="float",
-                                     dest="dia2", help="")
-
-        self.OptionParser.add_option("--d1", action="store", type="float",
-                                     dest="d1", help="")
-        self.OptionParser.add_option("--d2", action="store", type="float",
-                                     dest="d2", help="")
-        self.OptionParser.add_option("--needle_w", action="store",
-                                     type="float",
-                                     dest="needle_w", help="")
-        self.OptionParser.add_option("--needle_h", action="store",
-                                     type="float",
-                                     dest="needle_h", help="")
-        self.OptionParser.add_option("--needle_tf", action="store",
-                                     type="float",
-                                     dest="needle_tf", help="")
-        self.OptionParser.add_option("--needle_corner_rotation",
-                                     action="store",
-                                     type="inkbool", default=True,
-                                     dest="needle_corner_rotation", help="")
+        self.arg_parser.add_argument("--tabs")
+        self.arg_parser.add_argument("--w1", type=float)
+        self.arg_parser.add_argument("--w2", type=float)
+        self.arg_parser.add_argument("--h1", type=float)
+        self.arg_parser.add_argument("--h2", type=float)
+        self.arg_parser.add_argument("--bw", type=float)
+        self.arg_parser.add_argument("--bl", type=float)
+        self.arg_parser.add_argument("--bf", type=float)
+        self.arg_parser.add_argument("--dia1", type=float)
+        self.arg_parser.add_argument("--dia2", type=float)
+        self.arg_parser.add_argument("--d1", type=float)
+        self.arg_parser.add_argument("--d2", type=float)
+        self.arg_parser.add_argument("--needle_w", type=float)
+        self.arg_parser.add_argument("--needle_h", type=float)
+        self.arg_parser.add_argument("--needle_tf", type=float)
+        self.arg_parser.add_argument("--needle_corner_rotation", type=inkex.Boolean, default=True)
 
     def effect(self):
         # inkex.errormsg('view_center=%s' % str(self.view_center))
@@ -505,7 +475,7 @@ class PliersCover(inkex.Effect):
 
         # グループ作成
         attr = {inkex.addNS('label', 'inkscape'): 'PliersCover'}
-        self.g = inkex.etree.SubElement(self.current_layer, 'g', attr)
+        self.g = etree.SubElement(self.svg.get_current_layer(), 'g', attr)
 
         part1 = Part1(self.g,
                       opt.w1, opt.w2, opt.h1, opt.h2,
@@ -522,5 +492,4 @@ class PliersCover(inkex.Effect):
 
 
 if __name__ == '__main__':
-    e = PliersCover()
-    e.affect()
+    PliersCover().run()
