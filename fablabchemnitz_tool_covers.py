@@ -138,7 +138,7 @@ class SvgPath(SvgObj):
 
         svg_d = self.create_svg_d(origin, self.points)
         # inkex.errormsg('svg_d=%s' % svg_d)
-        # inkex.errormsg('svg_d=%s' % str(simplepath.parsePath( svg_d )))
+        # inkex.errormsg('svg_d=%s' % str(Path( svg_d )))
 
         self.attr['d'] = svg_d
         return super(SvgPath, self).draw(color, stroke_width, stroke_dasharray)
